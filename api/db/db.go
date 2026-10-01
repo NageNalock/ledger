@@ -26,7 +26,7 @@ func InitDB() {
 	}
 
 	// Auto Migrate
-	err = DB.AutoMigrate(&model.User{}, &model.SystemSetting{}, &model.CategoryL1{}, &model.CategoryL2{}, &model.Transaction{}, &model.Project{}, &model.TransactionDraft{}, &model.AnalysisRun{}, &model.Budget{}, &model.BudgetLine{})
+	err = autoMigratePreservingSequences(DB, &model.User{}, &model.SystemSetting{}, &model.CategoryL1{}, &model.CategoryL2{}, &model.Transaction{}, &model.Project{}, &model.TransactionDraft{}, &model.AnalysisRun{}, &model.Budget{}, &model.BudgetLine{})
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
@@ -104,4 +104,28 @@ func seedCategories() {
 			DB.Create(&model.CategoryL2{ParentID: l1.ID, Name: sub})
 		}
 	}
+}
+
+// SQLite table rebuilds may reset AUTOINCREMENT to MAX(id), forgetting IDs
+// belonging to deleted rows. Preserve the high-water marks across migrations.
+func autoMigratePreservingSequences(database *gorm.DB, models ...any) error {
+	type sequence struct {
+		Name string
+		Seq  int64
+	}
+	var sequences []sequence
+	if database.Migrator().HasTable("sqlite_sequence") {
+		if err := database.Table("sqlite_sequence").Find(&sequences).Error; err != nil {
+			return err
+		}
+	}
+	if err := database.AutoMigrate(models...); err != nil {
+		return err
+	}
+	for _, s := range sequences {
+		if err := database.Exec("UPDATE sqlite_sequence SET seq = ? WHERE name = ? AND seq < ?", s.Seq, s.Name, s.Seq).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }

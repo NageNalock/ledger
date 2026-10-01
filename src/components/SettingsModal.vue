@@ -13,6 +13,32 @@ const emit = defineEmits(['update:visible'])
 const userStore = useUserStore()
 const activeTab = ref('profile')
 const loading = ref(false)
+const exporting = ref(false)
+const exportBackup = async () => {
+  exporting.value = true
+  try {
+    const res = await fetch('/api/backup/export', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
+    })
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}))
+      throw new Error(error.error || '导出失败，请重试')
+    }
+    const url = URL.createObjectURL(await res.blob())
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `ledger-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.zip`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    ElMessage.success('迁移备份已导出')
+  } catch (error) {
+    ElMessage.error(error instanceof Error ? error.message : '导出失败')
+  } finally {
+    exporting.value = false
+  }
+}
 
 // System Settings Form
 const systemForm = reactive({
@@ -272,6 +298,14 @@ const fetchModels = async () => {
             <el-button type="primary" color="#FF6B35" :loading="loading" @click="handleSystemSubmit">
               保存系统设置
             </el-button>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane v-if="userStore.user.role === 'admin'" label="数据迁移" name="backup">
+        <div class="space-y-4 py-4">
+          <p>导出完整迁移备份，包含所有账号、流水、分类、项目、预算、系统设置和上传文件。</p>
+          <p class="text-sm text-gray-500">备份包含密码哈希和 AI 密钥，请妥善保管。迁移切换前请暂停记账和导入，再导出最终备份。</p>
+          <el-button type="primary" color="#FF6B35" :loading="exporting" @click="exportBackup">导出迁移备份</el-button>
+          <p class="text-sm text-gray-500">新机器使用项目 scripts/restore_backup.py 恢复到新目录；环境配置需单独设置，详细步骤见 MIGRATION_MCP.md。</p>
         </div>
       </el-tab-pane>
     </el-tabs>

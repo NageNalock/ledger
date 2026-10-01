@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
@@ -8,6 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ledger - 可爱记账</title>
+    <meta name="description" content="Ledger 记账服务。公开 MCP 与 SKILL.md 接入说明，使用 Ledger 账号密码调用流水工具。" />
+    <link rel="alternate" type="text/markdown" href="/SKILL.md" title="Ledger agent skill" />
+    <link rel="alternate" type="text/markdown" href="/skills/douyin-ledger/SKILL.md" title="抖音截图记账 skill" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="Ledger agent discovery" />
     <script type="module">
       if (import.meta.hot?.on) {
         import.meta.hot.on('vite:error', (error) => {
@@ -22,6 +26,9 @@
   </head>
   <body>
     <div id="app"></div>
+    <noscript>
+      <p>Ledger 记账界面需要 JavaScript。Agent 可匿名读取 <a href="/agent">MCP 接入说明</a>、<a href="/SKILL.md">SKILL.md</a> 和 <a href="/llms.txt">发现索引</a>。MCP 端点为同一 origin 下的 /mcp（Streamable HTTP），每次请求用 Authorization: Basic 携带 Ledger 账号密码；无需网页登录，实际数据操作必须鉴权。</p>
+    </noscript>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

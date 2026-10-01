@@ -23,7 +23,7 @@
 ### 依赖
 
 - Node.js 18+
-- Go 1.24+
+- Go 1.25+
 
 ### 1）配置环境变量
 
@@ -110,6 +110,10 @@ chmod +x build.sh server_control.sh
 ./server_control.sh start
 ./server_control.sh status
 ```
+
+## 数据迁移与 MCP
+
+管理员可在设置中导出完整迁移备份；`/mcp` 支持携带记账账号密码调用流水增删改查工具。恢复步骤和 Codex 接入配置见 [MIGRATION_MCP.md](./MIGRATION_MCP.md)。
 
 ## License
 

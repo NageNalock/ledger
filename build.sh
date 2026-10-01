@@ -16,7 +16,7 @@ if [ -f package.json ]; then
 fi
 
 echo "构建后端..."
-required_go_minor=24
+required_go_minor=25
 go_version="$(go env GOVERSION 2>/dev/null || true)"
 if [[ ! "$go_version" =~ ^go1\.([0-9]+)\..*$ ]]; then
   echo "无法检测 Go 版本，请确保已安装 Go 1.${required_go_minor}+" >&2

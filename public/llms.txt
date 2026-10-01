@@ -1,0 +1,14 @@
+# Ledger
+
+> 共享记账服务。下面的接入说明和 skill 可匿名读取；账务数据及 MCP 工具必须使用 Ledger 账号密码鉴权。
+
+- [Agent 接入说明](/agent): MCP 端点、认证、配置及协议示例。
+- [Ledger skill](/SKILL.md): 可读取或保存的记账工作流，包含查询、新增、修改、删除的约束。
+- [Skill canonical file](/skills/ledger/SKILL.md): 与 /SKILL.md 相同的 skill 文件。
+- [抖音截图记账 Skill](/skills/douyin-ledger/SKILL.md): 无订单号截图的重复核对；用户明确选择消费时间或入账时间后再记账。
+
+MCP endpoint: /mcp（与本索引同一 origin，HTTP POST，Streamable HTTP）
+Authentication: Authorization: Basic <base64(UTF-8 username:password)>
+Credentials: Ledger 网页账号密码；无需网页登录、JWT、验证码或 OAuth。实际账密通过 HTTPS 或 SSH 隧道发送。
+Discovery: 使用 MCP initialize / notifications/initialized / tools/list。GET /mcp 不是文档页面。
+Tools: list_transactions, get_transaction, create_transaction, update_transaction, delete_transaction, list_categories, list_projects.

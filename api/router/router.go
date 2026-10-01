@@ -2,6 +2,7 @@ package router
 
 import (
 	"ledger/api/controller"
+	"ledger/api/mcpserver"
 	"ledger/api/middleware"
 	"os"
 	"strings"
@@ -55,6 +56,21 @@ func SetupRouter() *gin.Engine {
 	r.StaticFile("/favicon.ico", "./dist/favicon.ico")
 	r.StaticFile("/logo.jpeg", "./dist/logo.jpeg")
 
+	// Public, read-only discovery documents. MCP itself remains authenticated.
+	r.StaticFile("/agent", "./dist/agent.html")
+	r.StaticFile("/llms.txt", "./dist/llms.txt")
+	serveSkill := func(file string) gin.HandlerFunc {
+		return func(c *gin.Context) {
+			c.Header("Content-Type", "text/markdown; charset=utf-8")
+			c.Header("X-Content-Type-Options", "nosniff")
+			c.File(file)
+		}
+	}
+	ledgerSkill := serveSkill("./dist/skills/ledger/SKILL.md")
+	r.Match([]string{"GET", "HEAD"}, "/SKILL.md", ledgerSkill)
+	r.Match([]string{"GET", "HEAD"}, "/skills/ledger/SKILL.md", ledgerSkill)
+	r.Match([]string{"GET", "HEAD"}, "/skills/douyin-ledger/SKILL.md", serveSkill("./dist/skills/douyin-ledger/SKILL.md"))
+
 	// SPA Fallback
 	r.NoRoute(func(c *gin.Context) {
 		// If request path starts with /api, return 404
@@ -90,6 +106,9 @@ func SetupRouter() *gin.Engine {
 		c.Next()
 	})
 
+	mcpHandler := mcpserver.NewHandler()
+	r.Any("/mcp", gin.WrapH(mcpHandler))
+
 	api := r.Group("/api")
 	{
 		auth := api.Group("/auth")
@@ -111,6 +130,8 @@ func SetupRouter() *gin.Engine {
 			protected.POST("/users", controller.CreateUser)
 			protected.DELETE("/users/:id", controller.DeleteUser)
 			protected.PUT("/users/profile", controller.UpdateUserProfile) // Self update
+
+			protected.GET("/backup/export", controller.ExportBackup)
 
 			protected.GET("/settings", controller.GetSystemSettings)
 			protected.PUT("/settings", controller.UpdateSystemSettings)

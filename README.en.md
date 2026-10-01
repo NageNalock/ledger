@@ -23,7 +23,7 @@ Personal finance ledger with budgets, projects, reports, and optional AI spendin
 ### Prerequisites
 
 - Node.js 18+
-- Go 1.24+
+- Go 1.25+
 
 ### 1) Configure environment
 

@@ -35,6 +35,10 @@ func CreateTransaction(c *gin.Context) {
 		return
 	}
 
+	if !validateTransactionReferences(c, input) {
+		return
+	}
+
 	tTime, err := time.Parse(time.RFC3339, input.TransactionTime) // Expecting ISO 8601 / RFC3339
 	if err != nil {
 		// Try RFC3339 with space instead of T
@@ -85,6 +89,10 @@ func UpdateTransaction(c *gin.Context) {
 		return
 	}
 
+	if !validateTransactionReferences(c, input) {
+		return
+	}
+
 	tTime, err := time.Parse(time.RFC3339, input.TransactionTime) // Expecting ISO 8601 / RFC3339
 	if err != nil {
 		// Try RFC3339 with space instead of T
@@ -117,7 +125,7 @@ func UpdateTransaction(c *gin.Context) {
 		"project_id":       input.ProjectID,
 	}
 
-	res := db.DB.Model(&model.Transaction{}).Where("id = ?", id).Updates(updates)
+	res := transactionQuery(c).Model(&model.Transaction{}).Where("id = ?", id).Updates(updates)
 	if res.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": res.Error.Error()})
 		return
@@ -138,7 +146,7 @@ func UpdateTransaction(c *gin.Context) {
 
 func DeleteTransaction(c *gin.Context) {
 	id := c.Param("id")
-	res := db.DB.Where("id = ?", id).Delete(&model.Transaction{})
+	res := transactionQuery(c).Where("id = ?", id).Delete(&model.Transaction{})
 	if res.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": res.Error.Error()})
 		return
@@ -161,7 +169,7 @@ func GetTransactions(c *gin.Context) {
 		orderClause = sortBy + " " + order
 	}
 
-	query := db.DB.Preload("User").Preload("CategoryL1").Preload("CategoryL2").Preload("Project").Order(orderClause)
+	query := transactionQuery(c).Preload("User").Preload("CategoryL1").Preload("CategoryL2").Preload("Project").Order(orderClause)
 	if userID := c.Query("user_id"); userID != "" {
 		query = query.Where("transactions.user_id = ?", userID)
 	}

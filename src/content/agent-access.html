@@ -1,0 +1,62 @@
+<style>
+.agent-access{max-width:1060px;margin:0 auto;color:#402c27;font-family:ui-sans-serif,system-ui,sans-serif;line-height:1.65}.agent-access *{box-sizing:border-box}.agent-access .aa-hero{padding:38px;border:1px solid #f1d6d0;border-radius:28px;background:linear-gradient(130deg,#fff8f2,#fff);box-shadow:0 12px 35px #6b3f1a08}.agent-access .aa-kicker{color:#a44422;font-size:12px;letter-spacing:.13em;font-weight:800}.agent-access h1{font-size:clamp(28px,5vw,42px);line-height:1.2;margin:12px 0 18px;font-weight:800}.agent-access h2{font-size:20px;font-weight:750;margin:0 0 12px}.agent-access h3{font-size:15px;font-weight:750;margin:18px 0 8px}.agent-access p{margin:10px 0}.agent-access .aa-muted{color:#775e55}.agent-access .aa-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.agent-access a{color:#a43c17;text-decoration:underline;text-underline-offset:3px}.agent-access .aa-button{display:inline-block;padding:10px 18px;border-radius:12px;border:1px solid #efc9b7;background:white;text-decoration:none;font-weight:700}.agent-access .aa-primary{background:#c94b1c;color:white;border-color:#c94b1c}.agent-access .aa-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}.agent-access .aa-card{padding:26px;background:white;border:1px solid #f1d6d0;border-radius:22px;min-width:0}.agent-access pre{overflow-x:auto;padding:16px;background:#302923;color:#fff5ee;border-radius:12px;font-size:12px;line-height:1.8;white-space:pre}.agent-access code{font-family:ui-monospace,SFMono-Regular,monospace;overflow-wrap:anywhere}.agent-access ul,.agent-access ol{padding-left:22px;margin:12px 0}.agent-access li{margin:7px 0}.agent-access .aa-note{font-size:13px;color:#775e55}.agent-access .aa-links{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px}.agent-access a:focus-visible{outline:3px solid #da8c5b;outline-offset:4px}@media(max-width:700px){.agent-access .aa-grid{grid-template-columns:1fr}.agent-access .aa-hero,.agent-access .aa-card{padding:22px}}
+</style>
+<section class="agent-access" aria-label="Ledger MCP 与 Skill 接入">
+  <div class="aa-hero">
+    <div class="aa-kicker">LEDGER · MCP &amp; SKILL</div>
+    <h1>让你的 Agent 帮你记账</h1>
+    <p class="aa-muted">读取本站地址即可了解如何连接。接入说明与 Skill 公开可读，流水查询和修改仍需使用你的 Ledger 账号密码。</p>
+    <div class="aa-actions">
+      <a class="aa-button aa-primary" href="/login">登录记账</a>
+      <a class="aa-button" href="/SKILL.md">通用记账 Skill</a>
+      <a class="aa-button" href="/skills/douyin-ledger/SKILL.md">抖音截图记账 Skill</a>
+    </div>
+    <p class="aa-note">可以告诉 Agent：“读取这个 Ledger 网站的 /SKILL.md，按说明连接并帮我记账。”</p>
+  </div>
+  <section class="aa-card" style="margin-top:20px" id="douyin">
+    <h2>抖音商城 · 截图记账</h2>
+    <p>没有订单号，也能先核对再记账。Agent 会结合金额、商品或商户、消费日期和入账日期比对已有流水，疑似重复的条目先交给你确认。</p>
+    <ul>
+      <li><strong>先明确日期口径：</strong>这批按消费时间，还是入账时间记账？未明确时只识别和核对。</li>
+      <li><strong>消费时间是购买时间：</strong>不代表已经核销。两种日期都会保留，缺失的日期不代填。</li>
+      <li><strong>避免重复支出：</strong>同时检查支付宝、微信及手工流水，不会因为金额相同就直接合并。</li>
+    </ul>
+    <p class="aa-note">示例：“按消费时间，把这些抖音账单截图核对后记入我的账本；不确定的条目先列出来。”</p>
+    <div class="aa-links"><a href="/skills/douyin-ledger/SKILL.md">读取抖音 Skill</a><a href="/skills/douyin-ledger/SKILL.md" download="SKILL.md">下载抖音 Skill</a><a href="/skills/ledger/SKILL.md" download="SKILL.md">下载通用记账 Skill</a></div>
+  </section>
+  <div class="aa-grid">
+    <section class="aa-card">
+      <h2>01 · MCP 连接</h2>
+      <p>端点：<code>/mcp</code>（本站协议、主机和端口 + <code>/mcp</code>）<br>传输：<strong>Streamable HTTP</strong></p>
+      <p>每次请求携带 <strong>Ledger 网页账号密码</strong>，不用先登录网页，不用 token、验证码或 OAuth。</p>
+      <pre><code>Authorization: Basic &lt;base64(UTF-8 用户名:密码)&gt;
+Content-Type: application/json
+Accept: application/json, text/event-stream</code></pre>
+      <p class="aa-note">这里使用记账账号，不是服务器 SSH 账号。公开页面不包含任何真实账号密码或模型密钥。</p>
+      <p class="aa-note">Base64 不是加密。传输实际密码时使用 HTTPS 或 SSH 隧道；当前若通过 HTTP 访问，请先配置加密连接。</p>
+    </section>
+    <section class="aa-card">
+      <h2>02 · 能做什么</h2>
+      <ul>
+        <li><code>list_transactions</code> · 筛选、分页查询流水</li>
+        <li><code>get_transaction</code> · 查询一笔流水</li>
+        <li><code>create_transaction</code> · 新增记账</li>
+        <li><code>update_transaction</code> · 修改已有流水</li>
+        <li><code>delete_transaction</code> · 删除指定流水</li>
+        <li><code>list_categories</code> / <code>list_projects</code> · 查询分类与项目</li>
+      </ul>
+      <p class="aa-note">普通账号通过 MCP 只能读写自己的流水；管理员可以读写全部。改密后旧凭据立即失效。</p>
+    </section>
+  </div>
+  <section class="aa-card">
+    <h2>03 · 配置与首次调用</h2>
+    <p>Codex 本地配置示例：将 URL 换成本站的 HTTPS 地址或 SSH 隧道地址。环境变量 <code>LEDGER_MCP_AUTH</code> 的值应为完整的 <code>Basic …</code> 请求头，并对运行 Codex 的进程可见。</p>
+    <pre><code>[mcp_servers.ledger]
+url = "https://YOUR_LEDGER_ORIGIN/mcp"
+env_http_headers = { Authorization = "LEDGER_MCP_AUTH" }</code></pre>
+    <p>用 MCP 客户端初始化后读取 <code>tools/list</code>，即可获取准确的参数定义。手动 HTTP 验证可以先发送：</p>
+    <pre><code>{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"ledger-agent","version":"1.0"}}}</code></pre>
+    <p class="aa-note">随后发送 <code>notifications/initialized</code> 和 <code>tools/list</code>，每次都带上同一 Basic 请求头。GET /mcp 不是说明页面；无凭据或错误凭据返回 401。浏览器 Origin 请求会返回 403，超过限额返回 429。</p>
+    <div class="aa-links"><a href="/SKILL.md">完整操作 Skill</a><a href="/llms.txt">Agent 发现索引</a><a href="/agent">独立接入说明</a><a href="https://developers.openai.com/codex/mcp" rel="noreferrer">Codex 官方配置文档</a></div>
+  </section>
+</section>

@@ -32,3 +32,8 @@ uploads
 
 ledger-server
 
+
+.env
+server.pid
+ledger-backup-*.zip
+__pycache__/

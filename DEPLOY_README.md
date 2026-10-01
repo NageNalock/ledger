@@ -39,3 +39,7 @@ chmod +x server_control.sh
 
 本项目使用 SQLite，数据库文件为 `ledger.db`，不会被编译脚本打包或复制。
 请自行备份 `ledger.db` 与 `uploads/` 目录。
+
+## 数据迁移与 MCP
+
+新版本需要 Go 1.25+。完整迁移导出、离线恢复与 MCP 账号密码接入方式见 [MIGRATION_MCP.md](./MIGRATION_MCP.md)。

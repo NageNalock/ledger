@@ -53,6 +53,8 @@ const handleSuccess = () => {
 
     <HomeModulesPanel :start-date="startDate" :end-date="endDate" :refresh-key="refreshKey" @add-transaction="handleAdd" />
 
+    <p class="text-right text-xs text-gray-500"><a href="/agent" class="hover:text-primary">MCP / Skill 接入说明</a></p>
+
     <TransactionModal v-model:visible="modalVisible" :edit-data="editData" @success="handleSuccess" />
   </div>
 </template>

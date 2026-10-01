@@ -89,6 +89,9 @@ const handleLogin = async () => {
         </el-form-item>
         <el-button type="primary" class="w-full mt-4" native-type="submit" color="#FF6B35">登录</el-button>
       </el-form>
+      <p class="text-center text-sm text-gray-600">
+        <a href="/agent" class="text-primary underline">MCP / Skill 接入说明</a>（无需登录）
+      </p>
     </div>
   </div>
 </template>
